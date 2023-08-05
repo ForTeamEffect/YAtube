@@ -65,6 +65,7 @@ class PostViewsTest(TestCase):
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
+                cache.clear()
 
     def test_group_slug(self):
         obj_group = self.authorized_client.get(
@@ -150,6 +151,7 @@ class PostViewsTest(TestCase):
                         zip(received[0], received[1]):
                     self.assertEqual(
                         increasing_received, increasing_gived)
+                    cache.clear()
 
     def check_context_contains_page_or_post(self, context, post=False):
         if post:
@@ -233,6 +235,7 @@ class PostViewsTest(TestCase):
                     self.assertFalse(response.context['is_edit'])
                 else:
                     self.assertTrue(response.context['is_edit'])
+                cache.clear()
 
     def test_cache(self):
         # print(cache.cache_page())

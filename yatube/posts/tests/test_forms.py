@@ -6,8 +6,6 @@ from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
-# from posts.models import Group, Post
 from posts.models import Group, Post, Comment
 from http import HTTPStatus
 
@@ -151,13 +149,16 @@ class PostFormsTests(TestCase):
         # self.assertEqual(post.text, form_data['text'])
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, '/auth/login/?next=/posts/1/edit/')
+
     def test_unauth_user_cant_publish_comment(self):
         post = Post.objects.create(
             author=self.user,
             text='Тестовый пост',
             group=self.group
         )
-        count_comments = len(Comment.objects.select_related('post').filter(post=post))
+        count_comments = len(
+            Comment.objects.select_related('post').filter(post=post)
+        )
         form_data = {
             'text': 'Тестовый комент'
         }
@@ -167,7 +168,9 @@ class PostFormsTests(TestCase):
             data=form_data,
             follow=True
         )
-        count_comments_after_post = len(Comment.objects.select_related('post').filter(post=post))
+        count_comments_after_post = len(
+            Comment.objects.select_related('post').filter(post=post)
+        )
         self.assertEqual(count_comments, count_comments_after_post)
 
     def test_auth_user_publish_comment(self):
@@ -176,7 +179,9 @@ class PostFormsTests(TestCase):
             text='Тестовый пост',
             group=self.group
         )
-        count_comments = len(Comment.objects.select_related('post').filter(post=post))
+        count_comments = len(
+            Comment.objects.select_related('post').filter(post=post)
+        )
         form_data = {
             'text': 'Тестовый комент'
         }
@@ -186,5 +191,7 @@ class PostFormsTests(TestCase):
             data=form_data,
             follow=True
         )
-        count_comments_after_post = len(Comment.objects.select_related('post').filter(post=post))
+        count_comments_after_post = len(
+            Comment.objects.select_related('post').filter(post=post)
+        )
         self.assertEqual(count_comments + 1, count_comments_after_post)

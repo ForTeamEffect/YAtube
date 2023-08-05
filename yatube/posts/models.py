@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from pytils.translit import slugify
-from datetime import datetime, time
 
 User = get_user_model()
 
@@ -91,16 +90,19 @@ class Comment(models.Model):
 class Follow(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         verbose_name='который подписывается',
         related_name='follower',
         null=True,
     )
     author = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         verbose_name='на которого подписываются',
         related_name='following',
         null=True,
     )
-
+    pub_date = models.DateTimeField(
+        'Дата комментирования',
+        auto_now_add=True
+    )

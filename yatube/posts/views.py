@@ -5,8 +5,6 @@ from posts.forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.views.decorators.cache import cache_page
-from itertools import chain
-from functools import reduce
 
 POSTS_PER_PAGE = 10
 
@@ -69,8 +67,8 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.select_related("group")
     page_obj = paginator(post_list, request, settings.POSTS_ON_PAGE)
-    following = (request.user.is_authenticated and
-                 Follow.objects.filter(author=author, user=request.user).exists)
+    following = (request.user.is_authenticated and Follow.objects.filter(
+        author=author, user=request.user).exists)
     context = {'post_list': post_list,
                'page_obj': page_obj,
                'author': author,
@@ -167,8 +165,8 @@ def follow_index(request):
     authors = Follow.objects.select_related('user', 'author').filter(
         user=request.user).values_list('author')
 
-    combined_results = Post.objects.\
-        filter(author__in=authors).\
+    combined_results = Post.objects. \
+        filter(author__in=authors). \
         order_by('-pub_date')
     page_obj = paginator(combined_results, request, settings.POSTS_ON_PAGE)
     context = {
@@ -181,10 +179,11 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     # Подписаться на автора
-    Follow.objects.create(
-        user=request.user,
-        author=User.objects.get(username=username)
-    )
+    if request.user.username != username:
+        Follow.objects.create(
+            user=request.user,
+            author=User.objects.get(username=username)
+        )
     return redirect('posts:profile', username=username)
 
 

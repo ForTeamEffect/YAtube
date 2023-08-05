@@ -5,9 +5,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, Client, override_settings
 from django.conf import settings
 from django.urls import reverse
-from posts.models import Group, Post, Comment, Follow
+from posts.models import Group, Post,  Follow
 from django import forms
-# from django.views.decorators import cache
 from django.core.cache import cache
 from django.conf import settings
 
@@ -243,7 +242,7 @@ class PostViewsTest(TestCase):
         )
         response_before_delete = self.guest_client.get(
             reverse('posts:index', )).content
-        Post.objects.get(text='удаляемый Тестовый пост').delete()
+        Post.objects.get(text=new_post.text).delete()
         response_after_delete = self.guest_client.get(
             reverse('posts:index', )).content
         self.assertEqual(response_before_delete, response_after_delete)

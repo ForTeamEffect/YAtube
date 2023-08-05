@@ -99,4 +99,3 @@ class Follow(models.Model):
         related_name='following',
         null=True,
     )
-

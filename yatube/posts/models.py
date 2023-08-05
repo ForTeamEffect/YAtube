@@ -62,12 +62,6 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    # post = models.ManyToOneRel(
-    #     to=Post,
-    #     on_delete=models.CASCADE,
-    #     field_name='Пост',
-    #     field=post,
-    #     related_name='comments')
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
@@ -84,7 +78,10 @@ class Comment(models.Model):
         'Текст комментария',
         help_text='Введите текст комментария'
     )
-    created = models.DateTimeField().auto_now_add
+    pub_date = models.DateTimeField(
+        'Дата комментирования',
+        auto_now_add=True
+    )
 
 
 class Follow(models.Model):
@@ -102,7 +99,4 @@ class Follow(models.Model):
         related_name='following',
         null=True,
     )
-    pub_date = models.DateTimeField(
-        'Дата комментирования',
-        auto_now_add=True
-    )
+

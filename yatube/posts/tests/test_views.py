@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, Client, override_settings
 from django.conf import settings
 from django.urls import reverse
-from posts.models import Group, Post,  Follow
+from posts.models import Group, Post, Follow
 from django import forms
 from django.core.cache import cache
 from django.conf import settings
@@ -266,7 +266,7 @@ class PostViewsTest(TestCase):
         checker_follow_index = \
             User.objects.create_user(username='checker_index_follow')
         authorized_client_checker_index_follow = Client()
-        authorized_client_checker_index_follow.\
+        authorized_client_checker_index_follow. \
             force_login(checker_follow_index)
         len_follow_index_checker_who_didnt_follow = len(
             authorized_client_checker_index_follow.get(

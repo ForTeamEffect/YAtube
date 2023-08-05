@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}
+Об Авторе
+{% endblock %}
+{% block content %}
+<!-- класс py-5 создает отступы сверху и снизу блока -->
+<div class="container py-5">
+    <h1>Страница «Технологии»</h1>
+    <article>
+        <h1>Помимо воблы мне помогли в употреблении и другии вещи, такие как:</h1>
+        <!--        class="list-group list-group-flush"-->
+        <aside class="col-12 col-md-3">
+            <ul>
+                <li>Встроенные классы
+                <li>Python</li>
+                <li>ООП Python</li>
+                <li>обучение в яндексе (да простит его вселенная)</li>
+                <li>django ORM</li>
+                <li>SQL-lite</li>
+                <li>venv</li>
+                <li>pip</li>
+                <li>github</li>
+                <li>база JS,..</li>
+
+            </ul>
+        </aside>
+    </article>
+</div>
+{% endblock %}
+
+
+<!--{% comment %} Колонки с отступом сверху и снизу {% endcomment %}-->
+<!--<div class="row">-->
+<!--  <h1>Вот что я умею</h1>-->
+<!--  {% comment %}-->
+<!--    Боковой блок со списком технологий -->
+<!--    Займет всю ширину блока на мобильном-->
+<!--    и 25% при размерах экрана ≥768px-->
+<!--  {% endcomment %}-->
+<!--  <aside class="col-12 col-md-3">-->
+<!--    <ul class="list-group list-group-flush">-->
+<!--      <li class="list-group-item">-->
+<!--        Python-->
+<!--      </li>-->
+<!--      <li class="list-group-item">-->
+<!--        Django-->
+<!--      </li>-->
+<!--    </ul>-->
+<!--  </aside>-->
+<!--  {% comment %}-->
+<!--    Статья  -->
+<!--    Займет всю ширину блока на мобильном-->
+<!--    и 75% при размерах экрана ≥768px-->
+<!--  {% endcomment %}-->
+<!--  <article class="col-12 col-md-9">-->
+<!--    <p>Текст страницы "Технологии"</p>-->
+<!--  </article>-->
+<!--</div>-->

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}
+Профайл пользователя {{post_list.first.author.get_full_name}}
+{%endblock%}
+{%block content%}
+<div class="container py-5  w-50 p-3">
+    {% csrf_token %}
+    {% if author != request.user %}
+    <div class="mb-5">
+        <h1>Все посты пользователя {{ author.get_full_name }}</h1>
+        <h3>Всего постов: {{ post_list|length }}</h3>
+        {% if following %}
+        <a
+                class="btn btn-lg btn-light"
+                href="{% url 'posts:profile_unfollow' author.username %}" role="button"
+        >
+            Отписаться
+        </a>
+        {% else %}
+        <a
+                class="btn btn-lg btn-primary"
+                href="{% url 'posts:profile_follow' author.username %}" role="button"
+        >
+            Подписаться
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    <article>
+        <ul>
+            <li>
+                Автор: {{ post_list.first.author.get_full_name }}
+                <a href="{% url 'posts:profile' author.username %}">все посты пользователя</a>
+            </li>
+            <li>
+                Дата публикации: {{ post_list.first.pub_date|date:"d E Y" }}
+            </li>
+        </ul>
+        {% for post in page_obj %}
+        {% include 'posts/includes/post_list.html' %}
+        {% if post.group %}
+        {% if not forloop.first %}
+        <br>
+        {% endif %}
+        <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+        {% endif %}
+        {% if not forloop.last %}
+        <hr>
+        {% endif %}
+        {% endfor %}
+        {% include 'posts/includes/paginator.html' %}
+        <!-- Остальные посты. после последнего нет черты -->
+        <!-- Здесь подключён паджинатор -->
+</div>
+</main>
+{%endblock%}

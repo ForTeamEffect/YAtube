@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    {% load static %}
+    {%include "includes/head.html"%}
+    <title>
+        {%block title%}
+        {%endblock%}
+    </title>
+</head>
+<body>
+{%include "includes/header.html"%}
+<main>
+    {%block content%}
+    {%endblock%}
+</main>
+{%include "includes/footer.html"%}
+</body>
+</html>

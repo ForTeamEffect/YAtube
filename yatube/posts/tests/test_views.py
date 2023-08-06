@@ -1,18 +1,12 @@
 import shutil
 import tempfile
 from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, Client, override_settings
-from django.conf import settings
 from django.urls import reverse
 from posts.models import Group, Post, Follow
 from django import forms
 from django.core.cache import cache
 from django.conf import settings
-from django.core.cache.backends.locmem import LocMemCache
-import manage
-from django.core.cache.utils import make_template_fragment_key
-from django.utils.cache import get_cache_key
 
 User = get_user_model()
 

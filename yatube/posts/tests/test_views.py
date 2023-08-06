@@ -9,6 +9,10 @@ from posts.models import Group, Post, Follow
 from django import forms
 from django.core.cache import cache
 from django.conf import settings
+from django.core.cache.backends.locmem import LocMemCache
+import manage
+from django.core.cache.utils import make_template_fragment_key
+from django.utils.cache import get_cache_key
 
 User = get_user_model()
 
@@ -86,72 +90,6 @@ class PostViewsTest(TestCase):
             reverse('posts:post_detail',
                     kwargs={'post_id': f'{self.post.pk}'})).context['page_obj']
         self.assertEqual(self.post.pk, obg_post_detail.pk)
-
-    def test_context(self):
-        small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
-        uploaded = SimpleUploadedFile(
-            name='small.gif',
-            content=small_gif,
-            content_type='image/gif'
-        )
-        # Отправляем POST-запрос
-        self.post16 = Post.objects.create(
-            author=self.user,
-            text='Тестовый тeкст',
-            group=self.group,
-            image=uploaded,
-        )
-
-        obj_index = self.authorized_client.get(
-            reverse('posts:index')).context['page_obj'][0]
-        obj_group = self.authorized_client.get(
-            reverse('posts:group_list',
-                    kwargs={'slug': f'{self.group.slug}'}
-                    )).context['page_obj'][0]
-        obj_profile = self.authorized_client.get(
-            reverse('posts:profile',
-                    kwargs={'username': f'{self.user}'}
-                    )).context['page_obj'][0]
-        obg_post_detail = self.authorized_client.get(
-            reverse('posts:post_detail',
-                    kwargs={'post_id': f'{self.user.posts.all()[0].pk}'}
-                    )).context['page_obj']
-
-        templates_reversed_names = {
-            # почему-то у первых трёх  не важно какой текст у поста если писать
-            # именно текстом, как в 4-й паре ключ-значения
-            obj_group: ([self.user, self.post16,
-                         self.group, self.post16.image],
-                        [obj_group.author, obj_group.text,
-                         obj_group.group, obj_group.image]),
-            obj_profile: (
-                [self.user, self.post16,
-                 self.group, self.post16.image],
-                [obj_profile.author, obj_profile.text,
-                 obj_profile.group, obj_profile.image]),
-            obj_index: ([self.user, self.post16,
-                         self.group, self.post16.image],
-                        [obj_index.author, obj_index.text,
-                         obj_index.group, obj_index.image]),
-            obg_post_detail: ([self.user, 'Тестовый тeкст',
-                               self.group, self.post16.image],
-                              [obg_post_detail.author, obg_post_detail.text,
-                               obg_post_detail.group, obg_post_detail.image])
-        }
-        for gived, received in templates_reversed_names.items():
-            with self.subTest(gived=gived):
-                for increasing_gived, increasing_received in \
-                        zip(received[0], received[1]):
-                    self.assertEqual(
-                        increasing_received, increasing_gived)
-                    cache.clear()
 
     def check_context_contains_page_or_post(self, context, post=False):
         if post:
@@ -231,24 +169,25 @@ class PostViewsTest(TestCase):
                 self.assertIn('form', response.context)
                 self.assertIsInstance(response.context['form'],
                                       forms.ModelForm)
-                if url == url_create:
-                    self.assertFalse(response.context['is_edit'])
-                else:
-                    self.assertTrue(response.context['is_edit'])
+                self.assertEqual(response.context['is_edit'], url == url_edit)
                 cache.clear()
 
     def test_cache(self):
-        # print(cache.cache_page())
         new_post = Post.objects.create(
             author=self.user,
             text='удаляемый Тестовый пост',
         )
-        response_before_delete = self.guest_client.get(
+        response_before_delete = self.authorized_client.get(
             reverse('posts:index', )).content
         Post.objects.get(text=new_post.text).delete()
-        response_after_delete = self.guest_client.get(
+        response_after_delete = self.authorized_client.get(
             reverse('posts:index', )).content
         self.assertEqual(response_before_delete, response_after_delete)
+        cache.clear()
+        response_after_cache_clear = self.authorized_client.get(
+            reverse('posts:index', )).content
+        self.assertNotEqual(response_after_cache_clear,
+                            response_before_delete)
 
     def test_follow_unfollow(self):
         checker_follow_unfollow = \
@@ -263,23 +202,6 @@ class PostViewsTest(TestCase):
         # сравнение кол-во объектов подписки до(+1) и после создания объекта
         self.assertEqual(count_follow_objects_after_create,
                          count_follow_objects_before + 1)
-        checker_follow_index = \
-            User.objects.create_user(username='checker_index_follow')
-        authorized_client_checker_index_follow = Client()
-        authorized_client_checker_index_follow. \
-            force_login(checker_follow_index)
-        len_follow_index_checker_who_didnt_follow = len(
-            authorized_client_checker_index_follow.get(
-                reverse('posts:follow_index')).context['page_obj'])
-        len_follow_index_checker = len(
-            authorized_client_checker.get(
-                reverse('posts:follow_index')).context['page_obj'])
-        # Проверка, что новая запись пользователя
-        # появляется в ленте тех, кто на
-        # него подписан и не появляется в ленте тех, кто не подписан.
-        self.assertEqual(
-            len_follow_index_checker_who_didnt_follow + 1,
-            len_follow_index_checker)
         authorized_client_checker.get(reverse(
             'posts:profile_unfollow',
             kwargs={'username': self.user.username}))
@@ -288,3 +210,29 @@ class PostViewsTest(TestCase):
         # и после удаления объекта
         self.assertEqual(count_follow_objects_after_delete,
                          count_follow_objects_before)
+
+    def test_unique_follow(self):
+        checker_follow_unfollow = \
+            User.objects.create_user(username='checker')
+        checker_follow_index = \
+            User.objects.create_user(username='checker_index_follow')
+        authorized_client_checker = Client()
+        authorized_client_checker_index_follow = Client()
+        authorized_client_checker.force_login(checker_follow_unfollow)
+        authorized_client_checker_index_follow. \
+            force_login(checker_follow_index)
+        authorized_client_checker.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user.username}))
+        len_follow_index_checker_who_didnt_follow = len(
+            authorized_client_checker_index_follow.get(
+                reverse('posts:follow_index')).context['page_obj'])
+        len_follow_index_checker = len(
+            authorized_client_checker.get(
+                reverse('posts:follow_index')).context['page_obj'])
+        # Проверка, что новая запись пользователя
+        # появляется в ленте тех кто на
+        # него подписан, и не появляется в ленте тех кто не подписан.
+        self.assertEqual(
+            len_follow_index_checker_who_didnt_follow + 1,
+            len_follow_index_checker)

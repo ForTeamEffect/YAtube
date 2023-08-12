@@ -178,8 +178,8 @@ def slugify(in_string):
     try:
         u_in_string = str(in_string).lower()
     except UnicodeDecodeError:
-        raise ValueError("We expects when in_string is str type," + \
-                         "it is an ascii, but now it isn't. Use unicode " + \
+        raise ValueError("We expects when in_string is str type," +
+                         "it is an ascii, but now it isn't. Use unicode " +
                          "in this case.")
     # convert & to "and"
     u_in_string = re.sub('\&amp\;|\&', ' and ', u_in_string)

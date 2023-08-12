@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from utils import slugify
+from tests.utils import slugify
 
 User = get_user_model()
 

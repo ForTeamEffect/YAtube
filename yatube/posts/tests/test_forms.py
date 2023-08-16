@@ -21,7 +21,7 @@ class PostFormsTests(TestCase):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
         cls.group = Group.objects.create(
-            title='Тестовая группа',
+            title='test_group',
             description='Тестовое описание')
 
     @classmethod
@@ -84,7 +84,7 @@ class PostFormsTests(TestCase):
             group=self.group
         )
         group2 = Group.objects.create(
-            title='Тестовая группа 2',
+            title='test_group2',
             description='Тестовое описание')
         form_data = {
             'author': self.user,

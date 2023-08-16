@@ -13,7 +13,7 @@ class PostUrlTest(TestCase):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
         cls.group = Group.objects.create(
-            title='Тестовая группа',
+            title='test_group',
             # slug='Тестовый слаг',
             description='Тестовое описание',
         )

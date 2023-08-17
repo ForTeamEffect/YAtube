@@ -196,6 +196,16 @@ class PostViewsTest(TestCase):
         # сравнение кол-во объектов подписки до(+1) и после создания объекта
         self.assertEqual(count_follow_objects_after_create,
                          count_follow_objects_before + 1)
+
+    def test_unfollow(self):
+        checker_follow_unfollow = \
+            User.objects.create_user(username='checker')
+        authorized_client_checker = Client()
+        authorized_client_checker.force_login(checker_follow_unfollow)
+        count_follow_objects_before = Follow.objects.count()
+        authorized_client_checker.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user.username}))
         authorized_client_checker.get(reverse(
             'posts:profile_unfollow',
             kwargs={'username': self.user.username}))

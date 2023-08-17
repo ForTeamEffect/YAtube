@@ -183,7 +183,7 @@ class PostViewsTest(TestCase):
         self.assertNotEqual(response_after_cache_clear,
                             response_before_delete)
 
-    def test_follow_unfollow(self):
+    def test_follow(self):
         checker_follow_unfollow = \
             User.objects.create_user(username='checker')
         authorized_client_checker = Client()

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'posts',
     'users.apps.UsersConfig',
     'core',
+    'menu',
     'about.apps.AboutConfig',
     'sorl.thumbnail',
     'debug_toolbar',

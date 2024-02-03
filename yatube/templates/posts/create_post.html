@@ -9,15 +9,15 @@
             <div class="card">
                 <div class="card-header">
                     Новый пост
-                </div>
-                <div class="card-body">
+                    </div>
+                <div class="card-body" style="padding: 0;">
                     {% if is_edit %}
                     <form method="post" action="{% url 'posts:post_edit' post.pk %}" enctype="multipart/form-data">
                         {% else %}
                         <form method="post" action="{% url 'posts:post_create' %}" enctype="multipart/form-data">
                             {% endif %}
                             {% csrf_token %}
-                            <div class="form-group row my-3 p-3">
+                            <div class="form-group row my-1 p-3">
                                 <label for="id_text">
                                     Текст поста
                                     <span class="required text-danger">*</span>
@@ -37,12 +37,9 @@
                                     Группа
                                 </label>
                                 <select name="group" class="form-control" id="id_group">
-                                    <option value={{form.group}}>
+                                    <option value={{ form.group }}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>></option>
                                     </option>
                                 </select>
-                                <small id="id_group-help" class="form-text text-muted">
-                                    Группа, к которой будет относиться пост
-                                </small>
                             </div>
                             <div class="form-group row my-3 p-3">
                                 <label for="id_image">
@@ -62,6 +59,7 @@
                         </form>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

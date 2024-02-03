@@ -1,0 +1,35 @@
+{% if not active_item %}
+<li class="nav-item">
+    <a class="nav-link {% if active_url == 'posts:index' %}active{% endif %}" href="{% url 'posts:index' %}">Меню</a>
+</li>
+{% endif %}
+
+{% if menu_items %}
+<ul class="nav">
+    {% for parent in ancestors %}
+    <li class="nav-item">
+        <a href="{{ parent.url }}" class="nav-link">{{ parent.name }}</a>
+        <ul class="submenu">
+    {% endfor %}
+
+    {% for item in menu_items %}
+    {% if item == active_item %}
+    <li class="nav-item {% if item == active_item or item in ancestors %}show{% endif %}">
+        <a href="{{ item.url }}" class="nav-link {% if item == active_item %}active{% endif %}">{{ item.name }}</a>
+        {% if item.children.all %}
+        <ul class="submenu">
+            {% for child in item.children.all %}
+            {% include 'includes/menu_item.html' with item=child active_item=active_item %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </li>
+    {% endif %}
+    {% endfor %}
+
+    {% for parent in ancestors %}
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}

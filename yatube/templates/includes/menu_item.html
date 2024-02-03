@@ -1,0 +1,6 @@
+{# menu_item.html #}
+
+<li class="nav-item {% if item == active_item %}show{% endif %}">
+    <a href="{{ item.url }}" class="nav-link {% if item == active_item %}active{% endif %}">{{ item.name }}</a>
+
+</li>

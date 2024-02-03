@@ -1,25 +1,33 @@
 {% if not active_item %}
+<!-- Отображаем пункт меню "Меню", если нет активного элемента -->
 <li class="nav-item">
     <a class="nav-link {% if active_url == 'posts:index' %}active{% endif %}" href="{% url 'posts:index' %}">Меню</a>
 </li>
 {% endif %}
 
 {% if menu_items %}
+<!-- Начинаем список навигации -->
 <ul class="nav">
     {% for parent in ancestors %}
+    <!-- Перебираем предков и создаем элементы для них -->
     <li class="nav-item">
         <a href="{{ parent.url }}" class="nav-link">{{ parent.name }}</a>
-        <ul class="submenu">
+        <ul class="submenu"> <!-- Открываем подменю для текущего предка -->
     {% endfor %}
 
     {% for item in menu_items %}
     {% if item == active_item %}
+    <!-- Если текущий элемент активный, создаем элемент меню -->
     <li class="nav-item {% if item == active_item or item in ancestors %}show{% endif %}">
         <a href="{{ item.url }}" class="nav-link {% if item == active_item %}active{% endif %}">{{ item.name }}</a>
         {% if item.children.all %}
+        <!-- Если у элемента есть дочерние элементы, создаем подменю -->
         <ul class="submenu">
             {% for child in item.children.all %}
-            {% include 'includes/menu_item.html' with item=child active_item=active_item %}
+            <!-- Перебираем дочерние элементы и создаем элементы подменю -->
+            <li class="nav-item {% if item == active_item %}show{% endif %}">
+                <a href="{{ item.url }}" class="nav-link {% if item == active_item %}active{% endif %}">{{ item.name }}</a>
+            </li>
             {% endfor %}
         </ul>
         {% endif %}
@@ -28,8 +36,10 @@
     {% endfor %}
 
     {% for parent in ancestors %}
-        </ul>
-    </li>
-    {% endfor %}
+    <!-- Закрываем подменю для текущего предка -->
+    </ul>
+</li>
+{% endfor %}
+<!-- Заканчиваем список навигации -->
 </ul>
 {% endif %}
